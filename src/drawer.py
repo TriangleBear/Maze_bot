@@ -13,6 +13,7 @@ BLACK = (0, 0, 0)
 GREEN = (0, 255, 0)
 RED = (255, 0, 0)
 BLUE = (0, 0, 255)
+GRAY = (169, 169, 169)
 
 # Constants for key codes
 KEY_B = 98  # "b" key
@@ -23,6 +24,7 @@ KEY_P = 112  # "p" key
 KEY_G = 103  # "g" key
 KEY_N = 110  # "n" key
 KEY_X = 120  # "x" key
+KEY_F9 = 120  # "F9" key (quit)
 
 # Define the grid size and cell size
 GRID_SIZE = 20
@@ -39,15 +41,19 @@ pygame.init()
 # Set up the display
 WINDOW_WIDTH = GRID_SIZE * CELL_SIZE
 WINDOW_HEIGHT = GRID_SIZE * CELL_SIZE
-WINDOW_SIZE = (WINDOW_WIDTH, WINDOW_HEIGHT)
+WINDOW_SIZE = (WINDOW_WIDTH, WINDOW_HEIGHT + 100)  # Increased height for the text screen
 screen = pygame.display.set_mode(WINDOW_SIZE)
 pygame.display.set_caption("Path Finding Game")
+
+# Create a separate screen for text
+text_screen = pygame.Surface((WINDOW_WIDTH, 100))
+text_screen.fill(GRAY)
 
 # Define fonts
 font = pygame.font.Font(None, 36)
 
-# Helper function to draw text on the screen
-def draw_text(text, color, x, y):
+# Helper function to draw text on the text screen
+def draw_text(text, color, x, y, screen):
     text_surface = font.render(text, True, color)
     screen.blit(text_surface, (x, y))
 
@@ -220,6 +226,7 @@ STATE_SIMULATING = 1
 
 # Initialize the state
 current_state = {"state": STATE_IDLE}
+placing_walls_mode = False  # Add this line to initialize placing_walls_mode
 
 running = True
 algorithm = None
@@ -262,7 +269,7 @@ while running:
     screen.fill(WHITE)
 
     for event in pygame.event.get():
-        if event.type == QUIT:
+        if event.type == QUIT or (event.type == KEYDOWN and event.key == KEY_F9):
             running = False
         if event.type == KEYDOWN:
             if event.key == KEY_B:
@@ -299,6 +306,15 @@ while running:
                 if current_state["state"] == STATE_SIMULATING:
                     current_state["state"] = STATE_IDLE
                     simulation_status = "Simulation Stopped"
+        elif placing_walls_mode and event.type == MOUSEBUTTONDOWN:
+            x, y = event.pos
+            cell_x = x // CELL_SIZE
+            cell_y = y // CELL_SIZE
+            if 0 <= cell_x < GRID_SIZE and 0 <= cell_y < GRID_SIZE:
+                if event.button == 1:  # Left mouse button
+                    grid[cell_x][cell_y].wall = True
+                elif event.button == 3:  # Right mouse button
+                    grid[cell_x][cell_y].wall = False
 
     draw_grid()
     start_cell.draw(GREEN)
@@ -309,8 +325,13 @@ while running:
             if cell != start_cell and cell != end_cell:
                 cell.draw(BLUE)
 
-    draw_text(f"User Action: {user_action}", BLACK, 10, WINDOW_HEIGHT - 80)
-    draw_text(f"Simulation Status: {simulation_status}", BLACK, 10, WINDOW_HEIGHT - 120)
+    # Draw text on the text screen
+    text_screen.fill(GRAY)
+    draw_text(f"User Action: {user_action}", BLACK, 10, 20, text_screen)
+    draw_text(f"Simulation Status: {simulation_status}", BLACK, 10, 60, text_screen)
+    
+    # Blit the text screen onto the main screen
+    screen.blit(text_screen, (0, WINDOW_HEIGHT))
 
     pygame.display.flip()
 
