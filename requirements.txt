@@ -1,4 +1,5 @@
 certifi
+flet
 charset-normalizer
 idna
 numpy
