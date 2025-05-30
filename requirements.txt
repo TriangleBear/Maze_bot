@@ -4,8 +4,6 @@ charset-normalizer
 idna
 numpy
 pipreqs
-pygame
-pygcurse
 requests
 urllib3
 yarg
