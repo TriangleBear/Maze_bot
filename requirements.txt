@@ -2,7 +2,6 @@ certifi==2023.7.22
 charset-normalizer==3.3.0
 idna==3.4
 numpy==2.0.2
-pipreqs==0.4.13
 requests==2.31.0
 urllib3==2.0.6
 yarg==0.1.9
