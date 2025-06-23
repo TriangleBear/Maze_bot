@@ -1,14 +1,15 @@
-// BFS, DFS, and A* for the grid
-export function bfs(grid, start, end) {
+// BFS, DFS, and A* for the grid as generators for step-by-step animation
+export function* bfs(grid, start, end) {
   const queue = [];
   queue.push(grid[start.x][start.y]);
   grid[start.x][start.y].visited = true;
-  let found = false;
   while (queue.length) {
     const current = queue.shift();
+    yield { x: current.x, y: current.y, type: 'visit' };
     if (current.x === end.x && current.y === end.y) {
-      found = true;
-      break;
+      markPath(grid, end);
+      yield { type: 'done', found: true };
+      return true;
     }
     for (const neighbor of getNeighbors(current, grid)) {
       if (!neighbor.visited && !neighbor.wall) {
@@ -18,20 +19,21 @@ export function bfs(grid, start, end) {
       }
     }
   }
-  if (found) markPath(grid, end);
-  return found;
+  yield { type: 'done', found: false };
+  return false;
 }
 
-export function dfs(grid, start, end) {
+export function* dfs(grid, start, end) {
   const stack = [];
   stack.push(grid[start.x][start.y]);
   grid[start.x][start.y].visited = true;
-  let found = false;
   while (stack.length) {
     const current = stack.pop();
+    yield { x: current.x, y: current.y, type: 'visit' };
     if (current.x === end.x && current.y === end.y) {
-      found = true;
-      break;
+      markPath(grid, end);
+      yield { type: 'done', found: true };
+      return true;
     }
     for (const neighbor of getNeighbors(current, grid)) {
       if (!neighbor.visited && !neighbor.wall) {
@@ -41,23 +43,24 @@ export function dfs(grid, start, end) {
       }
     }
   }
-  if (found) markPath(grid, end);
-  return found;
+  yield { type: 'done', found: false };
+  return false;
 }
 
-export function astar(grid, start, end) {
+export function* astar(grid, start, end) {
   const openSet = [];
   openSet.push(grid[start.x][start.y]);
   grid[start.x][start.y].g = 0;
   grid[start.x][start.y].f = heuristic(start, end);
-  let found = false;
   while (openSet.length) {
     openSet.sort((a, b) => a.f - b.f);
     const current = openSet.shift();
     current.visited = true;
+    yield { x: current.x, y: current.y, type: 'visit' };
     if (current.x === end.x && current.y === end.y) {
-      found = true;
-      break;
+      markPath(grid, end);
+      yield { type: 'done', found: true };
+      return true;
     }
     for (const neighbor of getNeighbors(current, grid)) {
       if (neighbor.wall) continue;
@@ -70,8 +73,8 @@ export function astar(grid, start, end) {
       }
     }
   }
-  if (found) markPath(grid, end);
-  return found;
+  yield { type: 'done', found: false };
+  return false;
 }
 
 function getNeighbors(cell, grid) {
