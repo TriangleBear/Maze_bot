@@ -1,0 +1,40 @@
+.App {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: Arial, sans-serif;
+}
+.controls {
+  margin-bottom: 16px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.grid {
+  display: flex;
+  flex-direction: column;
+}
+.grid-row {
+  display: flex;
+}
+.cell {
+  border: 1px solid #000;
+  background: #fff;
+  box-sizing: border-box;
+  cursor: pointer;
+}
+.cell.start {
+  background: #00ff00;
+}
+.cell.end {
+  background: #ff0000;
+}
+.cell.wall {
+  background: #000;
+}
+.cell.path {
+  background: #0000ff;
+}
+.cell.visited {
+  background: #ffff00;
+}
