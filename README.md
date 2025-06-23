@@ -2,6 +2,8 @@
 
 Maze Bot is a visual simulation tool for exploring and understanding pathfinding algorithms in a grid-based maze environment.
 
+**[Live Demo](https://symphonious-moxie-f1e6ec.netlify.app/)**
+
 ## Purpose
 
 This simulation is designed to help users:
