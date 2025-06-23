@@ -26,6 +26,8 @@ function App() {
   const [selectedAlgo, setSelectedAlgo] = useState(0);
   const [status, setStatus] = useState("Idle");
 
+  const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
   const handleCellClick = (x, y) => {
     if (placingWalls) {
       if ((x === start.x && y === start.y) || (x === end.x && y === end.y)) return;
@@ -64,14 +66,27 @@ function App() {
     setStatus("Random Walls Mode");
   };
 
-  const handleStart = () => {
+  const handleStart = async () => {
     setStatus("Simulation Started");
     let found = false;
-    let newGrid = grid.map((row) => row.map((cell) => ({ ...cell, visited: false, isPath: false })));
-    if (selectedAlgo === 0) found = bfs(newGrid, start, end);
-    else if (selectedAlgo === 1) found = dfs(newGrid, start, end);
-    else if (selectedAlgo === 2) found = astar(newGrid, start, end);
-    setGrid(newGrid);
+    let newGrid = grid.map((row) => row.map((cell) => ({ ...cell, visited: false, isPath: false, parent: undefined, g: undefined, f: undefined })));
+    let generator;
+    if (selectedAlgo === 0) generator = bfs(newGrid, start, end);
+    else if (selectedAlgo === 1) generator = dfs(newGrid, start, end);
+    else if (selectedAlgo === 2) generator = astar(newGrid, start, end);
+    for (let step of generator) {
+      if (step.type === 'visit') {
+        setGrid(newGrid.map(row => row.map(cell => ({ ...cell }))));
+
+        await sleep(20);
+      }
+      if (step.type === 'done') {
+        found = step.found;
+        break;
+      }
+    }
+    setGrid(newGrid.map(row => row.map(cell => ({ ...cell }))));
+
     setStatus(found ? "Simulation Completed" : "No path found or path is blocked");
   };
 
