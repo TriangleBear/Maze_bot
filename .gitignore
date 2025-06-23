@@ -153,3 +153,4 @@ cython_debug/
 *.h
 
 Scripts
+/react-visualizer/node_modules
